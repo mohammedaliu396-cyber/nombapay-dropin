@@ -1,1 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NombaPay Drop-in SDK Core Panel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    :root { --ink: #111827; --accent: #0f766e; --bg: #f9fafb; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); padding: 40px 20px; }
+    .container { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 20px; padding: 30px; boxShadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+    h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+    .tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: #e3f3f1; color: var(--accent); padding: 4px 10px; border-radius: 99px; text-transform: uppercase; display: inline-block; margin-bottom: 24px; }
+    .price-box { margin-bottom: 24px; }
+    .price-box label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+    .price { font-size: 42px; font-weight: 700; color: var(--ink); }
+    .field { margin-bottom: 20px; }
+    .field label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+    .field input { width: 100%; padding: 12px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; outline: none; }
+    .field input:focus { border-color: var(--accent); }
+    .pay-btn { width: 100%; background: var(--accent); color: white; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .pay-btn:hover { background: #0d635c; }
+    .pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .terminal { margin-top: 24px; background: #1f2937; border-radius: 10px; padding: 15px; color: #34d399; font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 80px; overflow-y: auto; }
+  </style>
+</head>
+<body>
 
+<div class="container">
+  <h2>NombaPay Drop-in Widget</h2>
+  <span class="badge tag">Hackathon Integration Engine</span>
+
+  <div class="price-box">
+    <label>Amount Due</label>
+    <div class="price">₦5,000.00</div>
+  </div>
+
+  <div class="field">
+    <label for="email">Customer Email Address</label>
+    <input type="email" id="email" value="demo@edoboy.dev">
+  </div>
+
+  <button class="pay-btn" id="payBtn">Pay with NombaPay</button>
+
+  <div class="terminal" id="terminalLog">> SDK Initialized. Ready to handle sandbox intent...</div>
+</div>
+
+<script src="../dist/nombapay-dropin.js"></script>
+<script>
+  // CHANGE THIS TO YOUR LIVE RENDER SERVER URL WHEN YOU DEPLOY
+  const BACKEND_URL = "https://nombapay-dropin.onrender.com";
+
+  const payBtn = document.getElementById("payBtn");
+  const terminalLog = document.getElementById("terminalLog");
+  const emailInput = document.getElementById("email");
+
+  function logToTerminal(msg, isError = false) {
+    terminalLog.innerHTML += `<br><span style="color: ${isError ? '#f87171' : '#34d399'}">> ${msg}</span>`;
+    console.log(msg);
+  }
+
+  payBtn.addEventListener("click", () => {
+    payBtn.disabled = true;
+    payBtn.textContent = "Opening secure checkout...";
+    logToTerminal("Contacting internal authentication proxy gateway...");
+
+    try {
+      NombaPayDropin.setup({
+        backendUrl: BACKEND_URL,
+        amount: 5000,
+        customerEmail: emailInput.value,
+        onSuccess: function (ref) {
+          logToTerminal("Payment Success! Verified Order Reference: " + ref);
+          resetButton();
+        },
+        onClose: function () {
+          logToTerminal("User terminated iframe modal view panel.");
+          resetButton();
+        },
+        onError: function (err) {
+          logToTerminal("Error caught during runtime: " + (err.message || "Connection refused"), true);
+          resetButton();
+        }
+      }).open();
+    } catch(e) {
+      logToTerminal("SDK Setup crash: " + e.message, true);
+      resetButton();
+    }
+  });
+
+  function resetButton() {
+    payBtn.disabled = false;
+    payBtn.textContent = "Pay with NombaPay";
+  }
+</script>
+
+</body>
+</html>
