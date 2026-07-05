@@ -61,7 +61,7 @@ app.post("/api/checkout/create", async (req, res) => {
     const token = await getAccessToken();
 
     // FIXED: Correct Sandbox endpoint pathway
-    const nombaRes = await fetch(`${NOMBA_BASE_URL}/sandbox/checkout/order`, {
+    const nombaRes = await fetch(`${NOMBA_BASE_URL}/v1/checkout/order`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -107,8 +107,7 @@ app.get("/api/checkout/verify/:orderReference", async (req, res) => {
 
     // FIXED: Correct Sandbox transaction lookup pathway
     const nombaRes = await fetch(
-      `${NOMBA_BASE_URL}/sandbox/checkout/transaction?orderReference=${orderReference}`,
-      {
+      `${NOMBA_BASE_URL}/v1/checkout/order?orderReference=${orderReference}`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
