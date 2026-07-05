@@ -48,7 +48,26 @@ async function getAccessToken() {
 app.get("/health", (req, res) => {
   res.json({ status: "ok", environment: "sandbox" });
 });
-
+app.get("/debug", async (req, res) => {
+  try {
+    const response = await fetch(`${NOMBA_BASE_URL}/v1/auth/token/issue`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accountId: NOMBA_ACCOUNT_ID,
+      },
+      body: JSON.stringify({
+        grant_type: "client_credentials",
+        client_id: NOMBA_CLIENT_ID,
+        client_secret: NOMBA_PRIVATE_KEY,
+      }),
+    });
+    const data = await response.json();
+    res.json({ status: response.status, nombaResponse: data });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
 // Create Checkout Order (FIXED URL PATHS)
 app.post("/api/checkout/create", async (req, res) => {
   try {
