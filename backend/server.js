@@ -34,12 +34,12 @@ async function getAccessToken() {
   });
 
   const data = await res.json();
-  if (!res.ok || !data.access_token) {
+  if (!res.ok || !data.data || !data.data.access_token) {
     console.error("Nomba Authentication Failed:", data);
     throw new Error(data.description || "Failed to authenticate with Nomba");
   }
 
-  cachedToken = data.access_token;
+  cachedToken = data.data.access_token;
   tokenExpiresAt = now + 50 * 60 * 1000; // Cache for 50 minutes
   return cachedToken;
 }
