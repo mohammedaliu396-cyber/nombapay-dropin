@@ -1,1 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NombaPay Drop-in — Secure Payment Integration Engine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
+:root {
+  --ink: #0d1117;
+  --ink-soft: #3d4750;
+  --ink-muted: #6b7680;
+  --paper: #ffffff;
+  --surface: #f6f8fa;
+  --border: #e1e5e9;
+  --accent: #0f766e;
+  --accent-deep: #0a5c55;
+  --accent-glow: rgba(15,118,110,0.12);
+  --nomba-green: #0f766e;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 30px;
+  height: 30px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-mark svg { width: 16px; height: 16px; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.nav-link:hover { background: var(--surface); color: var(--ink); }
+
+.nav-cta {
+  background: var(--accent);
+  color: white !important;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.nav-cta:hover { background: var(--accent-deep); }
+
+/* HERO */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 96px 24px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; gap: 48px; padding: 60px 24px; }
+  .hero-visual { order: -1; }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-glow);
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  border: 1px solid rgba(15,118,110,0.2);
+}
+
+.hero-badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+h1 {
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 44ch;
+  margin-bottom: 36px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-primary:hover { background: var(--accent-deep); }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.btn-secondary:hover { background: var(--border); }
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.stat-item { display: flex; flex-direction: column; gap: 2px; }
+
+.stat-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.stat-label { font-size: 12px; color: var(--ink-muted); }
+
+/* HERO VISUAL */
+.hero-visual {
+  position: relative;
+}
+
+.code-card {
+  background: var(--ink);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px -12px rgba(13,17,23,0.3);
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.code-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-dot-r { background: #ff5f56; }
+.code-dot-y { background: #ffbd2e; }
+.code-dot-g { background: #27c93f; }
+
+.code-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-left: 8px;
+}
+
+.code-body {
+  padding: 20px 20px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.c-comment { color: #6b7680; }
+.c-keyword { color: #ff7b72; }
+.c-string { color: #a5d6ff; }
+.c-func { color: #d2a8ff; }
+.c-prop { color: #79c0ff; }
+.c-value { color: #ffa657; }
+.c-plain { color: #e6edf3; }
+
+/* SECTION BASE */
+section { padding: 80px 24px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+
+.section-sub {
+  font-size: 17px;
+  color: var(--ink-soft);
+  max-width: 52ch;
+  line-height: 1.6;
+}
+
+/* HOW IT WORKS */
+.how-section { background: var(--surface); }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 56px;
+}
+
+@media (max-width: 768px) {
+  .steps { grid-template-columns: 1fr; }
+}
+
+.step {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+  background: var(--accent-glow);
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.step h3 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.step p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.step-code {
+  margin-top: 16px;
+  background: var(--ink);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #a5d6ff;
+  overflow-x: auto;
+}
+
+/* FEATURES */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 56px;
+}
+
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+}
+
+.feature {
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.feature:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--accent-glow);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.feature-icon svg { width: 20px; height: 20px; stroke: var(--accent); }
+
+.feature h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.feature p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* SECURITY */
+.security-section { background: var(--ink); color: white; }
+
+.security-section .section-title { color: white; }
+.security-section .section-sub { color: rgba(255,255,255,0.6); }
+.security-section .section-tag { color: #34d399; }
+
+.security-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 56px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .security-grid { grid-template-columns: 1fr; }
+}
+
+.security-points { display: flex; flex-direction: column; gap: 20px; }
+
+.security-point {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.security-check {
+  width: 24px;
+  height: 24px;
+  background: rgba(52,211,153,0.15);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.security-check svg { width: 14px; height: 14px; stroke: #34d399; }
+
+.security-point h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.security-point p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.5;
+}
+
+.arch-diagram {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.arch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 8px;
+}
+
+.arch-row:last-child { margin-bottom: 0; }
+
+.arch-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  min-width: 80px;
+}
+
+.arch-val {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+}
+
+.arch-arrow {
+  text-align: center;
+  color: rgba(255,255,255,0.2);
+  font-size: 18px;
+  margin: 4px 0;
+  padding-left: 16px;
+}
+
+/* CTA */
+.cta-section {
+  background: var(--accent);
+  color: white;
+  text-align: center;
+}
+
+.cta-section .section-title { color: white; }
+
+.cta-sub {
+  font-size: 17px;
+  color: rgba(255,255,255,0.8);
+  margin: 16px auto 36px;
+  max-width: 44ch;
+}
+
+.cta-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-white {
+  background: white;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 13px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.btn-white:hover { opacity: 0.9; }
+
+.btn-outline-white {
+  background: transparent;
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 13px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid rgba(255,255,255,0.4);
+  transition: border-color 0.15s;
+}
+
+.btn-outline-white:hover { border-color: white; }
+
+/* FOOTER */
+footer {
+  background: var(--ink);
+  color: rgba(255,255,255,0.4);
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 13px;
+}
+
+footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+footer a:hover { color: white; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </span>
+      NombaPay Drop-in
+    </a>
+    <div class="nav-links">
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#security" class="nav-link">Security</a>
+      <a href="https://nombapay-dropin.netlify.app" class="nav-cta" target="_blank">Launch Live Platform →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Nomba × DevCareer Hackathon 2026
+    </div>
+    <h1>Payments on <em>any website.</em> One script tag.</h1>
+    <p class="hero-sub">NombaPay Drop-in brings Nomba's full checkout experience — cards, transfers, USSD — to any site with a single function call. No frameworks. No complexity.</p>
+    <div class="hero-actions">
+      <a href="https://nombapay-dropin.netlify.app" class="btn-primary" target="_blank">
+        Open Active Production Console
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="https://github.com/mohammedaliu396-cyber/nombapay-dropin" class="btn-secondary" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View Repository Source
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">1</span>
+        <span class="stat-label">Script tag to install</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">0</span>
+        <span class="stat-label">Keys exposed client-side</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">&lt;5min</span>
+        <span class="stat-label">Integration time</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="code-card">
+      <div class="code-header">
+        <span class="code-dot code-dot-r"></span>
+        <span class="code-dot code-dot-y"></span>
+        <span class="code-dot code-dot-g"></span>
+        <span class="code-filename">checkout.js</span>
+      </div>
+      <div class="code-body">
+        <div><span class="c-comment">// 1. Add the script tag to your HTML</span></div>
+        <div><span class="c-plain">&lt;</span><span class="c-keyword">script</span> <span class="c-prop">src</span>=<span class="c-string">"nombapay-dropin.js"</span><span class="c-plain">&gt;&lt;/</span><span class="c-keyword">script</span><span class="c-plain">&gt;</span></div>
+        <br>
+        <div><span class="c-comment">// 2. Configure and open on button click</span></div>
+        <div><span class="c-func">NombaPayDropin</span><span class="c-plain">.</span><span class="c-func">setup</span><span class="c-plain">({</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">backendUrl</span><span class="c-plain">: </span><span class="c-string">"https://your-api.onrender.com"</span><span class="c-plain">,</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">amount</span><span class="c-plain">: </span><span class="c-value">5000</span><span class="c-plain">,</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">customerEmail</span><span class="c-plain">: </span><span class="c-string">"customer@email.com"</span><span class="c-plain">,</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">onSuccess</span><span class="c-plain">: </span><span class="c-keyword">function</span><span class="c-plain">(ref) {</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-func">console</span><span class="c-plain">.</span><span class="c-func">log</span><span class="c-plain">(</span><span class="c-string">"Paid!"</span><span class="c-plain">, ref);</span></div>
+        <div>&nbsp;&nbsp;</div>
+        <div><span class="c-plain">}).</span><span class="c-func">open</span><span class="c-plain">();</span></div>
+        <br>
+        <div><span class="c-comment">// That's it. Nomba checkout modal opens ✓</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-inner">
+    <div class="section-tag">How it works</div>
+    <h2 class="section-title">From zero to payments in three steps</h2>
+    <p class="section-sub">NombaPay Drop-in abstracts away the complexity of Nomba's API into a dead-simple developer interface.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">STEP 01</div>
+        <h3>Add the script</h3>
+        <p>Drop one script tag into your HTML. No npm, no bundler, no build step required.</p>
+        <div class="step-code">&lt;script src="nombapay-dropin.js"&gt;&lt;/script&gt;</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 02</div>
+        <h3>Deploy the proxy</h3>
+        <p>Host the backend folder on Render. Add your Nomba credentials as environment variables — they never touch your frontend.</p>
+        <div class="step-code">Root directory: backend<br>Start command: npm start</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 03</div>
+        <h3>Call .open()</h3>
+        <p>Configure with your backend URL and trigger on any button click. The full Nomba checkout modal appears — card, transfer, USSD.</p>
+        <div class="step-code">NombaPayDropin.setup({...}).open()</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-tag">Features</div>
+    <h2 class="section-title">Built for developers who move fast</h2>
+    <p class="section-sub">Everything you need to accept payments — nothing you don't.</p>
+
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <h3>Zero dependencies</h3>
+        <p>Pure vanilla JavaScript IIFE. Works in any browser, on any stack, without a build step or package manager.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <rect x="5" y="11" width="14" height="9" rx="2"/>
+            <path d="M8 11V7a4 4 0 018 0v4"/>
+          </svg>
+        </div>
+        <h3>Security-first architecture</h3>
+        <p>Credentials live only in your backend environment. The browser never sees your client_id or private key.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3>Multiple payment methods</h3>
+        <p>Cards, bank transfers, and USSD — all through Nomba's hosted checkout. No extra config needed.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h3>Token caching</h3>
+        <p>The backend caches Nomba access tokens for up to 50 minutes, reducing API calls and speeding up checkout.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <path d="M22 6l-10 7L2 6"/>
+          </svg>
+        </div>
+        <h3>Event callbacks</h3>
+        <p>onSuccess, onClose, and onError callbacks give you full control over the payment lifecycle in your app.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NombaPay Drop-in — Secure Payment Integration Engine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink: #0d1117;
+  --ink-soft: #3d4750;
+  --ink-muted: #6b7680;
+  --paper: #ffffff;
+  --surface: #f6f8fa;
+  --border: #e1e5e9;
+  --accent: #0f766e;
+  --accent-deep: #0a5c55;
+  --accent-glow: rgba(15,118,110,0.12);
+  --nomba-green: #0f766e;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 30px;
+  height: 30px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-mark svg { width: 16px; height: 16px; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  font-size: 14px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.nav-link:hover { background: var(--surface); color: var(--ink); }
+
+.nav-cta {
+  background: var(--accent);
+  color: white !important;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.nav-cta:hover { background: var(--accent-deep); }
+
+/* HERO */
+.hero {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 96px 24px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; gap: 48px; padding: 60px 24px; }
+  .hero-visual { order: -1; }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-glow);
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  border: 1px solid rgba(15,118,110,0.2);
+}
+
+.hero-badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+h1 {
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 44ch;
+  margin-bottom: 36px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-primary:hover { background: var(--accent-deep); }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.btn-secondary:hover { background: var(--border); }
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.stat-item { display: flex; flex-direction: column; gap: 2px; }
+
+.stat-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.stat-label { font-size: 12px; color: var(--ink-muted); }
+
+/* HERO VISUAL */
+.hero-visual {
+  position: relative;
+}
+
+.code-card {
+  background: var(--ink);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px -12px rgba(13,17,23,0.3);
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.code-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.code-dot-r { background: #ff5f56; }
+.code-dot-y { background: #ffbd2e; }
+.code-dot-g { background: #27c93f; }
+
+.code-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-left: 8px;
+}
+
+.code-body {
+  padding: 20px 20px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.c-comment { color: #6b7680; }
+.c-keyword { color: #ff7b72; }
+.c-string { color: #a5d6ff; }
+.c-func { color: #d2a8ff; }
+.c-prop { color: #79c0ff; }
+.c-value { color: #ffa657; }
+.c-plain { color: #e6edf3; }
+
+/* SECTION BASE */
+section { padding: 80px 24px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+
+.section-sub {
+  font-size: 17px;
+  color: var(--ink-soft);
+  max-width: 52ch;
+  line-height: 1.6;
+}
+
+/* HOW IT WORKS */
+.how-section { background: var(--surface); }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 56px;
+}
+
+@media (max-width: 768px) {
+  .steps { grid-template-columns: 1fr; }
+}
+
+.step {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+  background: var(--accent-glow);
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.step h3 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.step p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.step-code {
+  margin-top: 16px;
+  background: var(--ink);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #a5d6ff;
+  overflow-x: auto;
+}
+
+/* FEATURES */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 56px;
+}
+
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
+}
+
+.feature {
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.feature:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--accent-glow);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.feature-icon svg { width: 20px; height: 20px; stroke: var(--accent); }
+
+.feature h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.feature p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* SECURITY */
+.security-section { background: var(--ink); color: white; }
+
+.security-section .section-title { color: white; }
+.security-section .section-sub { color: rgba(255,255,255,0.6); }
+.security-section .section-tag { color: #34d399; }
+
+.security-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 56px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .security-grid { grid-template-columns: 1fr; }
+}
+
+.security-points { display: flex; flex-direction: column; gap: 20px; }
+
+.security-point {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.security-check {
+  width: 24px;
+  height: 24px;
+  background: rgba(52,211,153,0.15);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.security-check svg { width: 14px; height: 14px; stroke: #34d399; }
+
+.security-point h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.security-point p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.5;
+}
+
+.arch-diagram {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.arch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 8px;
+}
+
+.arch-row:last-child { margin-bottom: 0; }
+
+.arch-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  min-width: 80px;
+}
+
+.arch-val {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+}
+
+.arch-arrow {
+  text-align: center;
+  color: rgba(255,255,255,0.2);
+  font-size: 18px;
+  margin: 4px 0;
+  padding-left: 16px;
+}
+
+/* CTA */
+.cta-section {
+  background: var(--accent);
+  color: white;
+  text-align: center;
+}
+
+.cta-section .section-title { color: white; }
+
+.cta-sub {
+  font-size: 17px;
+  color: rgba(255,255,255,0.8);
+  margin: 16px auto 36px;
+  max-width: 44ch;
+}
+
+.cta-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-white {
+  background: white;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 13px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.btn-white:hover { opacity: 0.9; }
+
+.btn-outline-white {
+  background: transparent;
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 13px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid rgba(255,255,255,0.4);
+  transition: border-color 0.15s;
+}
+
+.btn-outline-white:hover { border-color: white; }
+
+/* FOOTER */
+footer {
+  background: var(--ink);
+  color: rgba(255,255,255,0.4);
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 13px;
+}
+
+footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+footer a:hover { color: white; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </span>
+      NombaPay Drop-in
+    </a>
+    <div class="nav-links">
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#security" class="nav-link">Security</a>
+      <a href="https://nombapay-dropin.netlify.app" class="nav-cta" target="_blank">Launch Live Platform →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Nomba × DevCareer Hackathon 2026
+    </div>
+    <h1>Payments on <em>any website.</em> One script tag.</h1>
+    <p class="hero-sub">NombaPay Drop-in brings Nomba's full checkout experience — cards, transfers, USSD — to any site with a single function call. No frameworks. No complexity.</p>
+    <div class="hero-actions">
+      <a href="https://nombapay-dropin.netlify.app" class="btn-primary" target="_blank">
+        Open Active Production Console
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="https://github.com/mohammedaliu396-cyber/nombapay-dropin" class="btn-secondary" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View Repository Source
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">1</span>
+        <span class="stat-label">Script tag to install</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">0</span>
+        <span class="stat-label">Keys exposed client-side</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">&lt;5min</span>
+        <span class="stat-label">Integration time</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="code-card">
+      <div class="code-header">
+        <span class="code-dot code-dot-r"></span>
+        <span class="code-dot code-dot-y"></span>
+        <span class="code-dot code-dot-g"></span>
+        <span class="code-filename">checkout.js</span>
+      </div>
+      <div class="code-body">
+        <div><span class="c-comment">// 1. Add the script tag to your HTML</span></div>
+        <div><span class="c-plain">&lt;</span><span class="c-keyword">script</span> <span class="c-prop">src</span>=<span class="c-string">"nombapay-dropin.js"</span><span class="c-plain">&gt;&lt;/</span><span class="c-keyword">script</span><span class="c-plain">&gt;</span></div>
+        <br>
+        <div><span class="c-comment">// 2. Configure and open on button click</span></div>
+        <div><span class="c-func">NombaPayDropin</span><span class="c-plain">.</span><span class="c-func">setup</span><span class="c-plain">({</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">backendUrl</span><span class="c-plain">: </span><span class="c-string">"https://your-api.onrender.com"</span><span class="c-plain">,</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">amount</span><span class="c-plain">: </span><span class="c-value">5000</span><span class="c-plain">,</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">customerEmail</span><span class="c-plain">: </span><span class="c-string">"customer@email.com"</span><span class="c-plain">,</span></div>
+        <div>&nbsp;&nbsp;<span class="c-prop">onSuccess</span><span class="c-plain">: </span><span class="c-keyword">function</span><span class="c-plain">(ref) {</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-func">console</span><span class="c-plain">.</span><span class="c-func">log</span><span class="c-plain">(</span><span class="c-string">"Paid!"</span><span class="c-plain">, ref);</span></div>
+        <div>&nbsp;&nbsp;</div>
+        <div><span class="c-plain">}).</span><span class="c-func">open</span><span class="c-plain">();</span></div>
+        <br>
+        <div><span class="c-comment">// That's it. Nomba checkout modal opens ✓</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-inner">
+    <div class="section-tag">How it works</div>
+    <h2 class="section-title">From zero to payments in three steps</h2>
+    <p class="section-sub">NombaPay Drop-in abstracts away the complexity of Nomba's API into a dead-simple developer interface.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">STEP 01</div>
+        <h3>Add the script</h3>
+        <p>Drop one script tag into your HTML. No npm, no bundler, no build step required.</p>
+        <div class="step-code">&lt;script src="nombapay-dropin.js"&gt;&lt;/script&gt;</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 02</div>
+        <h3>Deploy the proxy</h3>
+        <p>Host the backend folder on Render. Add your Nomba credentials as environment variables — they never touch your frontend.</p>
+        <div class="step-code">Root directory: backend<br>Start command: npm start</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 03</div>
+        <h3>Call .open()</h3>
+        <p>Configure with your backend URL and trigger on any button click. The full Nomba checkout modal appears — card, transfer, USSD.</p>
+        <div class="step-code">NombaPayDropin.setup({...}).open()</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-tag">Features</div>
+    <h2 class="section-title">Built for developers who move fast</h2>
+    <p class="section-sub">Everything you need to accept payments — nothing you don't.</p>
+
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <h3>Zero dependencies</h3>
+        <p>Pure vanilla JavaScript IIFE. Works in any browser, on any stack, without a build step or package manager.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <rect x="5" y="11" width="14" height="9" rx="2"/>
+            <path d="M8 11V7a4 4 0 018 0v4"/>
+          </svg>
+        </div>
+        <h3>Security-first architecture</h3>
+        <p>Credentials live only in your backend environment. The browser never sees your client_id or private key.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3>Multiple payment methods</h3>
+        <p>Cards, bank transfers, and USSD — all through Nomba's hosted checkout. No extra config needed.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h3>Token caching</h3>
+        <p>The backend caches Nomba access tokens for up to 50 minutes, reducing API calls and speeding up checkout.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <path d="M22 6l-10 7L2 6"/>
+          </svg>
+        </div>
+        <h3>Event callbacks</h3>
+        <p>onSuccess, onClose, and onError callbacks give you full control over the payment lifecycle in your app.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+        </div>
+        <h3>Drop-in UX</h3>
+        <p>Smooth modal with blur overlay, close on Escape, click-outside dismiss, and loading states built in.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="security-section" id="security">
+  <div class="section-inner">
+    <div class="section-tag">Security</div>
+    <h2 class="section-title">Your credentials. Your control.</h2>
+    <p class="section-sub">NombaPay Drop-in is built around a core principle: sensitive credentials never touch the browser.</p>
+
+    <div class="security-grid">
+      <div class="security-points">
+        <div class="security-point">
+          <div class="security-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div>
+            <h4>Backend proxy pattern</h4>
+            <p>Your Nomba client_id and private_key live only in server environment variables. The plugin only ever receives a checkout URL.</p>
+          </div>
+        </div>
+        <div class="security-point">
+          <div class="security-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div>
+            <h4>Short-lived tokens</h4>
+            <p>OAuth2 access tokens are generated server-side, cached for 50 minutes, and never forwarded to the client.</p>
+          </div>
+        </div>
+        <div class="security-point">
+          <div class="security-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div>
+            <h4>Gitignored secrets</h4>
+            <p>.env files are blocked from Git commits. The repo only contains a .env.example showing structure, never real values.</p>
+          </div>
+        </div>
+        <div class="security-point">
+          <div class="security-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div>
+            <h4>Server-side verification</h4>
+            <p>Payment status is verified through the backend before your app treats a transaction as complete.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-diagram">
+        <div class="arch-row">
+          <span class="arch-label">Browser</span>
+          <span class="arch-val">NombaPayDropin.setup({...}).open()</span>
+        </div>
+        <div class="arch-arrow">↓ POST /api/checkout/create</div>
+        <div class="arch-row">
+          <span class="arch-label">Backend</span>
+          <span class="arch-val">Auth → Create Order → Return checkoutLink only</span>
+        </div>
+        <div class="arch-arrow">↓ checkoutLink URL</div>
+        <div class="arch-row">
+          <span class="arch-label">Browser</span>
+          <span class="arch-val">Opens Nomba hosted checkout in iframe</span>
+        </div>
+        <div class="arch-arrow">↓ Customer pays</div>
+        <div class="arch-row">
+          <span class="arch-label">Nomba</span>
+          <span class="arch-val">Processes payment → Fires callback</span>
+        </div>
+        <div class="arch-arrow">↓ onSuccess(orderReference)</div>
+        <div class="arch-row">
+          <span class="arch-label">Your app</span>
+          <span class="arch-val">Verify → Deliver value to customer ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-inner">
+    <h2 class="section-title">Explore the Live Integration Platform</h2>
+    <p class="cta-sub">Open the production console interface to experience the full operational token caching and real-time execution logger.</p>
+    <div class="cta-btns">
+      <a href="https://nombapay-dropin.netlify.app" class="btn-white" target="_blank">Launch Active Interface</a>
+      <a href="https://github.com/mohammedaliu396-cyber/nombapay-dropin" class="btn-outline-white" target="_blank">View Source Code</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Built by <a href="https://github.com/mohammedaliu396-cyber" target="_blank">Mohammed Aliu Oziegbe (Edoboy)</a> for the Nomba × DevCareer Hackathon 2026 &nbsp;·&nbsp; <a href="https://github.com/mohammedaliu396-cyber/nombapay-dropin" target="_blank">GitHub</a></p>
+</footer>
+
+</body>
+</html>
